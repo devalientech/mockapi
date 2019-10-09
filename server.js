@@ -18,5 +18,5 @@ if (cluster.isMaster) {
     const app = new App();
     app.listen(3000);
     
-    console.log(`Worker ${process.pid} started`);
+    console.log(`Worker ${process.pid} started on port 3000...`);
 }

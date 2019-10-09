@@ -1,29 +1,19 @@
-const bluebird = require('bluebird')
-const redis = require('redis')
-
-bluebird.promisifyAll(redis.RedisClient.prototype)
-bluebird.promisifyAll(redis.Multi.prototype)
-
-const client = redis.createClient();
+const { RedisClient } = require('../api/common/redisClient')
 
 module.exports = async (ctx, next) => {
-
+    const redisClient = new RedisClient();
     const cacheKey = getCacheKey(ctx.request.url)
-    // console.log('cache get', cacheKey)
 
-    const cacheResult = await client.getAsync(cacheKey)
+    const cacheResult = await redisClient.get(cacheKey)
     if (cacheResult) {
-        // console.log('cache result')
-        ctx.body = JSON.parse(cacheResult);
+        ctx.body = cacheResult
     } else {
         await next()
-
         if (ctx.body) {
-            // console.log('cache set')
-            await client.setexAsync(cacheKey, 60, JSON.stringify(ctx.body))
+            await redisClient.set(cacheKey, ctx.body, 60)
         }
     }
-};
+}
 
 function getCacheKey(url) {
     return url.replace('/', '').replace(/\?|\&|\=/g, ':');

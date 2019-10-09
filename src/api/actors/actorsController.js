@@ -1,4 +1,4 @@
-const db = require('../../config/db')
+const db = require('../common/dbClient')
 const formatter = require('../../utils/formatter')
 
 class ActorsController {
